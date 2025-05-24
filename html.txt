@@ -1,0 +1,183 @@
+<style>
+    #energyCalculatorContainer {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 20px auto;
+    }
+    #energyCalculatorContainer h2, #energyCalculatorContainer h3 {
+        color: #333;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .calculator-section {
+        background-color: #fff;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        border: 1px solid #eee;
+    }
+    .calculator-section label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+    .calculator-section input[type="text"],
+    .calculator-section input[type="number"],
+    .calculator-section select {
+        width: calc(100% - 22px);
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .calculator-section button {
+        background-color: #007bff; /* Azul Elementor o tu preferencia */
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+    }
+    .calculator-section button:hover {
+        background-color: #0056b3;
+    }
+    #addedAppliancesTable {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+    #addedAppliancesTable th, #addedAppliancesTable td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+    #addedAppliancesTable th {
+        background-color: #f2f2f2;
+        color: #333;
+    }
+    #resultsSection {
+        background-color: #e6f7ff;
+        border-left: 5px solid #007bff;
+    }
+    #resultsSection p {
+        font-size: 1.1em;
+        color: #333;
+        margin: 10px 0;
+    }
+    #resultsSection strong {
+        color: #0056b3;
+    }
+    .appliance-input-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom:10px;
+    }
+    .appliance-input-group > div {
+        flex: 1;
+        min-width: 150px;
+    }
+     .remove-btn {
+        background-color: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .remove-btn:hover {
+        background-color: #c82333;
+    }
+</style>
+
+<div id="energyCalculatorContainer">
+    <h2>Calculadora de Consumo Energético e Independencia</h2>
+
+    <!-- Sección para añadir aparatos -->
+    <div class="calculator-section">
+        <h3>1. Añadir Aparatos Eléctricos</h3>
+        
+        <label for="commonAppliance">Seleccionar aparato común (opcional):</label>
+        <select id="commonAppliance">
+            <option value="">-- Seleccione un aparato --</option>
+            <!-- Opciones se llenarán con JavaScript -->
+        </select>
+
+        <div class="appliance-input-group">
+            <div>
+                <label for="applianceName">Nombre del Aparato:</label>
+                <input type="text" id="applianceName" placeholder="Ej: Bombillo LED">
+            </div>
+            <div>
+                <label for="appliancePower">Potencia (Watts):</label>
+                <input type="number" id="appliancePower" placeholder="Ej: 10">
+            </div>
+        </div>
+        <div class="appliance-input-group">
+            <div>
+                <label for="applianceQuantity">Cantidad:</label>
+                <input type="number" id="applianceQuantity" value="1" min="1">
+            </div>
+            <div>
+                <label for="applianceHours">Horas de uso al día:</label>
+                <input type="number" id="applianceHours" placeholder="Ej: 5" min="0" max="24" step="0.1">
+            </div>
+        </div>
+        <button onclick="addAppliance()">Añadir Aparato</button>
+    </div>
+
+    <!-- Sección de aparatos añadidos -->
+    <div class="calculator-section">
+        <h3>2. Aparatos en Cálculo</h3>
+        <table id="addedAppliancesTable">
+            <thead>
+                <tr>
+                    <th>Aparato</th>
+                    <th>Potencia (W)</th>
+                    <th>Cantidad</th>
+                    <th>Horas/día</th>
+                    <th>Consumo Diario (kWh)</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="appliancesList">
+                <!-- Los aparatos añadidos aparecerán aquí -->
+            </tbody>
+        </table>
+        <p><strong>Consumo Diario Total: <span id="totalDailyConsumption">0.00</span> kWh</strong></p>
+    </div>
+
+    <!-- Sección de autonomía y cálculo final -->
+    <div class="calculator-section">
+        <h3>3. Configuración de Autonomía y Cálculo</h3>
+        <label for="autonomyHours">Horas de Autonomía Deseadas:</label>
+        <input type="number" id="autonomyHours" placeholder="Ej: 24" value="24" min="1">
+        
+        <label for="peakSunHours">Horas Solares Pico (HSP) en tu zona:</label>
+        <input type="number" id="peakSunHours" value="4.5" step="0.1" min="1" title="Promedio de horas con máxima irradiación solar. Varía por ubicación geográfica y estación. Consulta datos locales.">
+        
+        <button onclick="calculateSystemSize()">Calcular Sistema Necesario</button>
+    </div>
+
+    <!-- Sección de resultados -->
+    <div id="resultsSection" class="calculator-section" style="display:none;">
+        <h3>4. Resultados Estimados del Sistema Fotovoltaico</h3>
+        <p>Consumo Energético Diario Total: <strong id="resultDailyKWh"></strong> kWh</p>
+        <p>Potencia Pico de Paneles Solares Necesaria: <strong id="resultSolarPanelKWp"></strong> kWp</p>
+        <p>Capacidad de Almacenamiento en Baterías (para <span id="resultAutonomyHours"></span>h de autonomía): <strong id="resultBatteryKWh"></strong> kWh</p>
+        <p>Potencia Nominal Sugerida del Inversor: <strong id="resultInverterWatts"></strong> Watts</p>
+        <hr>
+        <p><em><strong>Nota Importante:</strong> Estos cálculos son una estimación. Factores como la eficiencia del inversor (~90-95%), pérdidas en cables, la profundidad de descarga (DoD) de las baterías (Litio ~80-90%, Plomo-Ácido ~50%), la eficiencia de carga/descarga de baterías (~80-95%), y la degradación de los paneles con el tiempo pueden afectar el tamaño real del sistema. Se recomienda un margen de seguridad (ej. 20-25% más en paneles y baterías) y consultar con un profesional para un diseño preciso. <strong>Para el inversor, considere también la capacidad de manejar picos de arranque de motores (ej. neveras, bombas, AC), que puede ser 2-3 veces su potencia nominal.</strong></em></p>
+    </div>
+</div>
+
+
+<script src="https://evergreenvzla.com/wp-content/uploads/2025/05/calculadora-energia.js" defer></script>
